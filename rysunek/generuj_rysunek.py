@@ -665,7 +665,7 @@ def draw_frame_and_tables(d: Draw):
     d.text(x0 + 176, y0 + 40.0, "A3", size=3.2, align="left", bold=True)
 
     d.text(x0 + 80, y0 + 32.6, "Arkusz", size=2.2, align="left")
-    d.text(x0 + 112, y0 + 32.4, "1/1", size=3.2, align="left", bold=True)
+    d.text(x0 + 112, y0 + 32.4, "1/2", size=3.2, align="left", bold=True)
     d.text(x0 + 150, y0 + 32.6, "Data", size=2.2, align="left")
     d.text(x0 + 168, y0 + 32.4, "2026-11-13", size=3.0, align="left")
 
@@ -729,10 +729,268 @@ def draw_frame_and_tables(d: Draw):
         "3. Pierścień osadczy dosunąć do czoła koła i ustalić",
         "    wkrętem poz. 6.",
         "4. Ostre krawędzie stępić.",
-        "5. Wymiary wykonawcze części — według rysunków elementów.",
+        "5. Wymiary wykonawcze wałka i koła — arkusz 2.",
     ]
     for i, line in enumerate(notes):
         d.text(nx, ny + 22 - i * 4.3, line, size=2.9, align="left")
+
+
+def _frame(d: Draw):
+    d.poly([(20, 10), (410, 10), (410, 287), (20, 287)], w=FRAME, close=True)
+
+
+def _title_sheet2(d: Draw):
+    """Tabliczka arkusza wymiarów, bez wykazu części."""
+    x0, y0, tw, th = 230, 10, 180, 44
+    d.poly([(x0, y0), (x0 + tw, y0), (x0 + tw, y0 + th), (x0, y0 + th)], w=MID, close=True)
+    d.line(x0, y0 + 16, x0 + tw, y0 + 16, w=THIN)
+    d.line(x0, y0 + 30, x0 + tw, y0 + 30, w=THIN)
+    d.line(x0 + 28, y0 + 30, x0 + 28, y0 + th, w=THIN)
+    d.line(x0 + 78, y0 + 30, x0 + 78, y0 + th, w=THIN)
+    d.line(x0 + 118, y0 + 30, x0 + 118, y0 + th, w=THIN)
+    d.line(x0 + 78, y0 + 37, x0 + tw, y0 + 37, w=THIN)
+    d.line(x0 + 148, y0 + 30, x0 + 148, y0 + th, w=THIN)
+    d.text(x0 + 14, y0 + 35.2, "ZL-01", size=4.2, align="center", bold=True)
+    d.text(x0 + 14, y0 + 31.2, "Nr rys.", size=2.2, align="center")
+    d.text(x0 + 80, y0 + 40.2, "Podziałka", size=2.2, align="left")
+    d.text(x0 + 112, y0 + 40.0, "1:1", size=3.2, align="left", bold=True)
+    d.text(x0 + 150, y0 + 40.2, "Format", size=2.2, align="left")
+    d.text(x0 + 170, y0 + 40.0, "A3", size=3.2, align="left", bold=True)
+    d.text(x0 + 80, y0 + 32.6, "Arkusz", size=2.2, align="left")
+    d.text(x0 + 112, y0 + 32.4, "2/2", size=3.2, align="left", bold=True)
+    d.text(x0 + 150, y0 + 32.6, "Data", size=2.2, align="left")
+    d.text(x0 + 168, y0 + 32.4, "2026-11-13", size=3.0, align="left")
+    d.text(x0 + 3, y0 + 23.6, "Wałek i koło zębate", size=4.2, align="left", bold=True)
+    d.text(x0 + 3, y0 + 18.2, "Wymiary wykonawcze", size=3.0, align="left")
+    d.text(x0 + 3, y0 + 9.2, "Kreślił", size=2.4, align="left")
+    d.text(x0 + 22, y0 + 8.8, "Jan", size=3.4, align="left", bold=True)
+    d.text(x0 + 55, y0 + 9.0, "Wymiary od baz opisanych przy widokach", size=2.5, align="left")
+
+
+def draw_sheet2(d: Draw):
+    """Wałek i koło zwymiarowane od baz, oraz wymiary części znormalizowanych."""
+    # --- wałek: odsadzenie w x = 96, oś y = 214 ---
+    def X(mx):
+        return 96 + mx
+
+    def Y(my):
+        return 214 + my
+
+    d.text(X(-18), Y(62), "1. Wałek", size=4.2, align="left", bold=True)
+    d.text(X(-18), Y(56), "Wymiary wzdłużne od płaszczyzny odsadzenia.", size=2.8, align="left")
+
+    d.centerline(X(-28), Y(0), X(68), Y(0))
+
+    # czop Ø45, przerwanie
+    d.line(X(-20), Y(22.5), X(0), Y(22.5))
+    d.line(X(-20), Y(-22.5), X(0), Y(-22.5))
+    br = []
+    for i in range(41):
+        t = i / 40.0
+        br.append((X(-20 + 2.2 * math.sin(t * 2 * math.pi)), Y(22.5 - 45 * t)))
+    d.poly(br)
+    d.line(X(0), Y(22.5), X(0), Y(16))
+    d.line(X(0), Y(-22.5), X(0), Y(-16))
+
+    # czop Ø32 i rowek wpustu
+    d.line(X(0), Y(16), X(3.75), Y(16))
+    d.line(X(3.75), Y(16), X(3.75), Y(12))
+    d.line(X(3.75), Y(12), X(28.75), Y(12))
+    d.line(X(28.75), Y(12), X(28.75), Y(16))
+    d.line(X(28.75), Y(16), X(45), Y(16))
+    d.line(X(45), Y(16), X(47), Y(14))
+    d.line(X(47), Y(14), X(49), Y(16))
+    d.line(X(49), Y(16), X(58), Y(16))
+    d.line(X(58), Y(16), X(60), Y(14))
+    d.line(X(60), Y(14), X(60), Y(-14))
+    d.line(X(60), Y(-14), X(58), Y(-16))
+    d.line(X(0), Y(-16), X(28.8), Y(-16))
+    d.line(X(28.8), Y(-16), X(32), Y(-12.8))
+    d.line(X(32), Y(-12.8), X(35.2), Y(-16))
+    d.line(X(35.2), Y(-16), X(58), Y(-16))
+
+    # wymiary wzdłużne nad wałkiem, kolejne poziomy
+    d.dim_h(X(3.75), X(28.75), Y(30), "25", ext_from=Y(16), ext_to=Y(16))
+    d.dim_h(X(0), X(3.75), Y(40), "3,75", ext_from=Y(22.5), ext_to=Y(16))
+    d.dim_h(X(0), X(47), Y(50), "47", ext_from=Y(22.5), ext_to=Y(16))
+    d.dim_h(X(0), X(60), Y(60), "60", ext_from=Y(22.5), ext_to=Y(14))
+    # gniazdo wkręta koła — pod wałkiem, bo leży na dolnej tworzącej
+    d.dim_h(X(0), X(32), Y(-36), "32", ext_from=Y(-22.5), ext_to=Y(-16))
+
+    d.dim_v(Y(-22.5), Y(22.5), X(-24), "Ø45", ext_from=X(-8), ext_to=X(-8), text_side="left")
+    d.dim_v(Y(-16), Y(16), X(74), "Ø32 js7", ext_from=X(58), ext_to=X(58), text_side="right", text_size=3.2)
+
+    d.line(X(59), Y(15), X(76), Y(34), w=THIN)
+    d.line(X(76), Y(34), X(82), Y(34), w=THIN)
+    d.text(X(83), Y(32.8), "2×45°", size=3.2, align="left")
+    d.line(X(32), Y(-12.8), X(40), Y(-28), w=THIN)
+    d.text(X(41), Y(-29.2), "3,2 × 90°", size=3.2, align="left")
+    d.line(X(47), Y(14), X(76), Y(26), w=THIN)
+    d.line(X(76), Y(26), X(82), Y(26), w=THIN)
+    d.text(X(83), Y(24.8), "2 × 90°", size=3.2, align="left")
+
+    # przekrój rowka, z prawej
+    cx, cy = 250, 214
+    d.text(cx, cy + 36, "rowek wpustu", size=3.2, align="center", bold=True)
+    yb = math.sqrt(16**2 - 4**2)
+    a_r = math.degrees(math.atan2(yb, 4))
+    a_l = math.degrees(math.atan2(yb, -4))
+    d.arc(cx, cy, 16, a_r, a_r - (360 - (a_l - a_r)), steps=64)
+    d.line(cx - 4, cy + yb, cx - 4, cy + 12)
+    d.line(cx + 4, cy + yb, cx + 4, cy + 12)
+    d.line(cx - 4, cy + 12, cx + 4, cy + 12)
+    d.centerline(cx - 22, cy, cx + 22, cy)
+    d.centerline(cx, cy - 20, cx, cy + 22)
+    # krótki wymiar nad rowkiem: tekst nie mieści się między pomocniczymi
+    d.line(cx - 4, cy + yb + 1.2, cx - 4, cy + 26, w=THIN)
+    d.line(cx + 4, cy + yb + 1.2, cx + 4, cy + 26, w=THIN)
+    d.line(cx - 10, cy + 24, cx + 10, cy + 24, w=THIN)
+    d._arrow(cx - 4, cy + 24, 180)
+    d._arrow(cx + 4, cy + 24, 0)
+    d.text(cx, cy + 25.2, "8 N9", size=3.2, align="center")
+    d.dim_v(cy + 12, cy + 16, cx + 18, "4", ext_from=cx + 4, ext_to=cx, text_side="right")
+
+    # --- koło: czoło wieńca x = 48, oś y = 108 ---
+    def U(mx):
+        return 48 + mx
+
+    def V(my):
+        return 108 + my
+
+    d.text(U(-4), V(52), "2. Koło zębate", size=4.2, align="left", bold=True)
+    d.text(U(-4), V(46), "Wymiary wzdłużne od czoła wieńca.   m = 3,   z = 22", size=2.8, align="left")
+
+    d.centerline(U(-6), V(0), U(46), V(0))
+    # zarys
+    d.line(U(0), V(36), U(25), V(36))
+    d.line(U(25), V(36), U(25), V(23))
+    d.line(U(25), V(23), U(39), V(23))
+    d.line(U(39), V(23), U(39), V(19.2))
+    d.line(U(0), V(36), U(0), V(19.2))
+    d.line(U(0), V(19.2), U(39), V(19.2))
+    d.line(U(0), V(30), U(25), V(30))
+    d.line(U(0), V(-30), U(25), V(-30))
+    d.dashdot_limited(U(0), V(33), U(25), V(33))
+    d.dashdot_limited(U(0), V(-33), U(25), V(-33))
+    d.line(U(0), V(-36), U(25), V(-36))
+    d.line(U(25), V(-36), U(25), V(-23))
+    # otwór M8 w ściance piasty: gruba = średnica 6,4, cienka = 8, fazka na zewnątrz
+    d.line(U(25), V(-23), U(28.6), V(-23))
+    d.line(U(35.4), V(-23), U(39), V(-23))
+    d.line(U(28.6), V(-23), U(28), V(-22.4))
+    d.line(U(35.4), V(-23), U(36), V(-22.4))
+    d.line(U(28), V(-22.4), U(28), V(-16), w=THIN)
+    d.line(U(36), V(-22.4), U(36), V(-16), w=THIN)
+    d.line(U(28.8), V(-21.6), U(28.8), V(-16))
+    d.line(U(35.2), V(-21.6), U(35.2), V(-16))
+    d.line(U(39), V(-23), U(39), V(-17))
+    d.line(U(39), V(-17), U(38), V(-16))
+    d.line(U(0), V(-36), U(0), V(-17))
+    d.line(U(0), V(-17), U(1), V(-16))
+    d.line(U(1), V(-16), U(28), V(-16))
+    d.line(U(36), V(-16), U(38), V(-16))
+    d.centerline(U(32), V(-14), U(32), V(-24))
+    d.line(U(32), V(-21), U(54), V(-30), w=THIN)
+    d.line(U(54), V(-30), U(60), V(-30), w=THIN)
+    d.text(U(61), V(-31.2), "M8", size=3.2, align="left")
+
+    d.hatch_poly(
+        [(U(0.4), V(19.6)), (U(38.6), V(19.6)), (U(38.6), V(22.8)), (U(0.4), V(22.8))],
+        spacing=2.0,
+        angle=45,
+    )
+    d.hatch_poly(
+        [(U(0.4), V(23.2)), (U(24.6), V(23.2)), (U(24.6), V(29.6)), (U(0.4), V(29.6))],
+        spacing=2.0,
+        angle=45,
+    )
+    d.hatch_poly(
+        [(U(0.4), V(-29.6)), (U(24.6), V(-29.6)), (U(24.6), V(-23.2)), (U(0.4), V(-23.2))],
+        spacing=2.0,
+        angle=45,
+    )
+    d.hatch_poly(
+        [(U(0.4), V(-22.6)), (U(27.6), V(-22.6)), (U(27.6), V(-16.4)), (U(0.4), V(-16.4))],
+        spacing=2.0,
+        angle=45,
+    )
+    d.hatch_poly(
+        [(U(36.4), V(-22.6)), (U(38.6), V(-22.6)), (U(38.6), V(-17.4)), (U(36.4), V(-17.4))],
+        spacing=2.0,
+        angle=45,
+    )
+
+    d.dim_h(U(0), U(25), V(-46), "25", ext_from=V(-36), ext_to=V(-36))
+    d.dim_h(U(0), U(32), V(-56), "32", ext_from=V(-36), ext_to=V(-23))
+    d.dim_h(U(0), U(39), V(-66), "39", ext_from=V(-36), ext_to=V(-23))
+    d.dim_v(V(-16), V(19.2), U(48), "35,2", ext_from=U(39), ext_to=U(39), text_side="right", text_size=3.2)
+    d.line(U(0), V(-18), U(-8), V(-28), w=THIN)
+    d.text(U(-22), V(-30), "1×45°", size=3.0, align="left")
+
+    # widok od strony piasty
+    scx, scy = 186, 108
+    d.circle(scx, scy, 36)
+    pat = f"[{3.2 * PT:.2f} {0.8 * PT:.2f} {0.3 * PT:.2f} {0.8 * PT:.2f}] 0"
+    d.circle(scx, scy, 33, w=THIN, dashes=pat)
+    d.circle(scx, scy, 23)
+    yb = math.sqrt(16**2 - 4**2)
+    a_r = math.degrees(math.atan2(yb, 4))
+    a_l = math.degrees(math.atan2(yb, -4))
+    d.arc(scx, scy, 16, a_r, a_r - (360 - (a_l - a_r)), steps=64)
+    d.line(scx - 4, scy + yb, scx - 4, scy + 19.2)
+    d.line(scx + 4, scy + yb, scx + 4, scy + 19.2)
+    d.line(scx - 4, scy + 19.2, scx + 4, scy + 19.2)
+    d.centerline(scx - 42, scy, scx + 42, scy)
+    d.centerline(scx, scy - 42, scx, scy + 22)
+    d.line(scx - 4, scy + 20.2, scx - 4, scy + 48, w=THIN)
+    d.line(scx + 4, scy + 20.2, scx + 4, scy + 48, w=THIN)
+    d.line(scx - 14, scy + 46, scx + 14, scy + 46, w=THIN)
+    d._arrow(scx - 4, scy + 46, 180)
+    d._arrow(scx + 4, scy + 46, 0)
+    d.text(scx, scy + 47.2, "8 JS9", size=3.2, align="center")
+    # średnice odnośnikami, po prawej stronie widoku
+    d.line(scx + 25.5, scy + 25.5, scx + 40, scy + 40, w=THIN)
+    d.line(scx + 40, scy + 40, scx + 52, scy + 40, w=THIN)
+    d.text(scx + 53, scy + 38.6, "Ø72", size=3.2, align="left")
+    d.line(scx + 23.3, scy + 23.3, scx + 40, scy + 32, w=THIN)
+    d.line(scx + 40, scy + 32, scx + 52, scy + 32, w=THIN)
+    d.text(scx + 53, scy + 30.6, "(Ø66)", size=3.2, align="left")
+    d.line(scx + 16.3, scy - 16.3, scx + 40, scy - 28, w=THIN)
+    d.line(scx + 40, scy - 28, scx + 52, scy - 28, w=THIN)
+    d.text(scx + 53, scy - 29.4, "Ø46", size=3.2, align="left")
+    d.line(scx + 11.3, scy - 11.3, scx + 40, scy - 36, w=THIN)
+    d.line(scx + 40, scy - 36, scx + 52, scy - 36, w=THIN)
+    d.text(scx + 53, scy - 37.4, "Ø32 H8", size=3.2, align="left")
+
+    # średnica dna wrębu przy przekroju
+    d.line(U(8), V(30), U(8), V(40), w=THIN)
+    d.line(U(8), V(40), U(20), V(40), w=THIN)
+    d.text(U(21), V(38.6), "Ø60", size=3.2, align="left")
+
+    # --- tabela części znormalizowanych ---
+    tx, ty = 308, 178
+    d.text(tx, ty, "Części znormalizowane", size=3.6, align="left", bold=True)
+    lines = [
+        "Wpust pryzmatyczny 8×7×25   PN-M-85005",
+        "fazka a = 0,8×45°",
+        "wał: szerokość 8 N9, głębokość t1 = 4",
+        "piasta: szerokość 8 JS9, głębokość t2 = 3,2",
+        "",
+        "Pierścień osadczy typ A 32   PN-M-85101",
+        "otwór 32, szerokość b = 16, średnica zewn. 52",
+        "fazka otworu 1,6×45°, gwint M8 w osi szerokości",
+        "",
+        "Wkręt dociskowy z końcem stożkowym",
+        "PN-EN ISO 7434",
+        "M8, stożek 90°, z = 3, rowek n = 1,2, t = 2",
+        "w kole M8×10,   w pierścieniu M8×12",
+    ]
+    for i, line in enumerate(lines):
+        bold = line.startswith("Wpust") or line.startswith("Pierścień") or line.startswith("Wkręt")
+        d.text(tx, ty - 8 - i * 4.6, line, size=2.9, align="left", bold=bold)
+
+    _frame(d)
+    _title_sheet2(d)
 
 
 def build():
@@ -744,11 +1002,15 @@ def build():
     draw_dimensions(d)
     draw_balloons(d)
     draw_frame_and_tables(d)
+
+    page2 = doc.new_page(width=W_MM * PT, height=H_MM * PT)
+    draw_sheet2(Draw(page2))
+
     doc.set_metadata(
         {
             "title": "ZL-01 Wałek z kołem zębatym — rysunek złożeniowy",
             "author": "Jan",
-            "subject": "Rysunek złożeniowy wg PN",
+            "subject": "Arkusz 1: złożenie. Arkusz 2: wymiary wałka, koła i części znormalizowanych.",
         }
     )
     doc.save(OUT, garbage=4, deflate=True)
